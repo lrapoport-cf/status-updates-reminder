@@ -12,7 +12,7 @@ let currentStatusFieldId: string | null = null;
 async function jiraFetch<T>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<T> {
+): Promise<T | null> {
   const token = getToken();
   
   const response = await fetch(`${JIRA_API_BASE}${endpoint}`, {
@@ -30,7 +30,13 @@ async function jiraFetch<T>(
     throw new Error(`Jira API error (${response.status}): ${errorText}`);
   }
 
-  return response.json() as Promise<T>;
+  // Handle empty responses (e.g., 204 No Content from PUT requests)
+  const text = await response.text();
+  if (!text) {
+    return null;
+  }
+
+  return JSON.parse(text) as T;
 }
 
 /**
@@ -43,6 +49,10 @@ export async function getCurrentStatusFieldId(): Promise<string> {
 
   const fields = await jiraFetch<JiraField[]>('/field');
   
+  if (!fields) {
+    throw new Error('Failed to fetch Jira fields');
+  }
+
   const currentStatusField = fields.find(
     (field) => field.name === 'Current Status' && field.custom
   );
@@ -70,6 +80,10 @@ export async function searchIssues(jql: string): Promise<JiraIssue[]> {
   const response = await jiraFetch<JiraSearchResponse>(
     `/search?jql=${encodedJql}&fields=${fields}&maxResults=100`
   );
+
+  if (!response) {
+    throw new Error('Failed to search Jira issues');
+  }
 
   return response.issues;
 }
