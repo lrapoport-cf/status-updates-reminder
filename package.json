@@ -1,0 +1,32 @@
+{
+  "name": "add-status",
+  "version": "1.0.0",
+  "description": "CLI tool for bulk updating Current Status field on Jira RM tickets",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "add-status": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "jira",
+    "cli",
+    "status-update"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
